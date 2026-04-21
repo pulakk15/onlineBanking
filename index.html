@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>NexaBank — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #1a1e28;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-dim: rgba(201,168,76,0.12);
+    --text: #f0ede6;
+    --muted: #7a7f8e;
+    --muted2: #a8acb8;
+    --green: #3ecf8e;
+    --green-bg: rgba(62,207,142,0.1);
+    --red: #f56565;
+    --red-bg: rgba(245,101,101,0.1);
+    --blue: #5b8dee;
+    --blue-bg: rgba(91,141,238,0.1);
+  }
+
+  html, body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── TOP NAV ─── */
+  .topnav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .logo-icon {
+    width: 30px; height: 30px;
+    background: var(--gold);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .logo-icon svg { width: 17px; height: 17px; }
+
+  .logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .logo-text span { color: var(--gold); }
+
+  .topnav-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .avatar {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, #c9a84c, #e8c97a);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600;
+    color: #1a1200;
+    flex-shrink: 0;
+  }
+
+  /* ─── SCROLL CONTENT ─── */
+  .content {
+    padding: 20px 16px 100px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ─── GREETING ─── */
+  .greeting {
+    margin-bottom: 20px;
+  }
+
+  .greeting h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .greeting p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* ─── ACCOUNT CARD ─── */
+  .account-card {
+    background: linear-gradient(135deg, #1e1608 0%, #2a1f0a 40%, #1a1608 100%);
+    border: 1px solid rgba(201,168,76,0.28);
+    border-radius: 18px;
+    padding: 22px 22px 20px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .account-card::before {
+    content: '';
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 170px; height: 170px;
+    background: radial-gradient(circle, rgba(201,168,76,0.13) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .account-card::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; left: 25%;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(201,168,76,0.07) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 26px;
+    position: relative; z-index: 1;
+  }
+
+  .card-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(201,168,76,0.7); }
+
+  .card-number {
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    color: rgba(240,237,230,0.45);
+    margin-top: 5px;
+    font-family: monospace;
+  }
+
+  .bank-chip {
+    width: 34px; height: 26px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .bank-chip svg { width: 21px; height: 17px; }
+
+  .card-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    position: relative; z-index: 1;
+  }
+
+  .balance-label {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(201,168,76,0.6);
+    margin-bottom: 4px;
+  }
+
+  .balance-amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 34px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .balance-amount sup {
+    font-size: 16px;
+    vertical-align: super;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+  }
+
+  .card-holder { text-align: right; }
+  .card-holder-label { font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(201,168,76,0.5); margin-bottom: 2px; }
+  .card-holder-name { font-size: 13px; font-weight: 500; letter-spacing: 0.04em; color: rgba(240,237,230,0.85); }
+  .card-holder-id { font-size: 10px; color: rgba(240,237,230,0.3); margin-top: 1px; font-family: monospace; }
+
+  /* ─── STATS GRID ─── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .stat-card.income::before { background: var(--green); }
+  .stat-card.expense::before { background: var(--red); }
+  .stat-card.transfer::before { background: var(--blue); }
+
+  .stat-icon {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 10px;
+  }
+
+  .stat-icon svg { width: 13px; height: 13px; }
+
+  .stat-card.income .stat-icon { background: var(--green-bg); }
+  .stat-card.income .stat-icon svg { stroke: var(--green); }
+  .stat-card.expense .stat-icon { background: var(--red-bg); }
+  .stat-card.expense .stat-icon svg { stroke: var(--red); }
+  .stat-card.transfer .stat-icon { background: var(--blue-bg); }
+  .stat-card.transfer .stat-icon svg { stroke: var(--blue); }
+
+  .stat-value { font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+  .stat-label { font-size: 10px; color: var(--muted); margin-top: 1px; }
+
+  .stat-change { font-size: 10px; margin-top: 5px; display: flex; align-items: center; gap: 2px; }
+  .stat-change.up { color: var(--green); }
+  .stat-change.down { color: var(--red); }
+
+  /* ─── QUICK ACTIONS ─── */
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  .actions-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    padding: 14px 8px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s;
+  }
+
+  .action-btn:active { background: var(--surface2); }
+
+  .action-btn-icon {
+    width: 38px; height: 38px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--gold-dim);
+  }
+
+  .action-btn-icon svg { width: 16px; height: 16px; stroke: var(--gold-light); }
+
+  .action-btn span { font-size: 11px; color: var(--muted2); font-weight: 400; text-align: center; }
+
+  /* ─── PANEL ─── */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 16px;
+    margin-bottom: 16px;
+  }
+
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  .panel-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .see-all { font-size: 12px; color: var(--gold); cursor: pointer; }
+
+  /* ─── TRANSACTIONS ─── */
+  .txn-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .txn-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+  .txn-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .txn-icon svg { width: 14px; height: 14px; }
+
+  .txn-icon.dep { background: var(--green-bg); }
+  .txn-icon.dep svg { stroke: var(--green); }
+  .txn-icon.wdw { background: var(--red-bg); }
+  .txn-icon.wdw svg { stroke: var(--red); }
+  .txn-icon.trf { background: var(--blue-bg); }
+  .txn-icon.trf svg { stroke: var(--blue); }
+
+  .txn-details { flex: 1; min-width: 0; }
+  .txn-name { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .txn-meta { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+  .txn-amount { text-align: right; flex-shrink: 0; }
+  .txn-amount .amount { font-size: 13px; font-weight: 600; }
+  .txn-amount .amount.pos { color: var(--green); }
+  .txn-amount .amount.neg { color: var(--red); }
+  .txn-amount .date { font-size: 10px; color: var(--muted); margin-top: 1px; }
+
+  /* ─── ACCOUNT INFO ─── */
+  .acc-info {
+    padding: 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 14px;
+  }
+
+  .acc-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 12.5px; }
+  .acc-row .k { color: var(--muted); }
+  .acc-row .v { color: var(--text); font-weight: 500; font-family: monospace; letter-spacing: 0.04em; }
+
+  /* ─── MINI CHART ─── */
+  .mini-chart { display: flex; align-items: flex-end; gap: 5px; height: 44px; margin-top: 14px; }
+  .bar { flex: 1; border-radius: 3px 3px 0 0; }
+  .chart-labels { display: flex; justify-content: space-between; margin-top: 4px; }
+  .chart-labels span { font-size: 10px; color: var(--muted); }
+
+  /* ─── STATUS BADGE ─── */
+  .badge-active {
+    font-size: 11px;
+    background: var(--green-bg);
+    color: var(--green);
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  /* ─── BOTTOM TAB BAR ─── */
+  .tab-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    padding: 10px 0 20px;
+    z-index: 100;
+  }
+
+  .tab-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 4px 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .tab-item svg { width: 20px; height: 20px; stroke: var(--muted); stroke-width: 1.7; fill: none; }
+  .tab-item span { font-size: 10px; color: var(--muted); font-weight: 400; }
+
+  .tab-item.active svg { stroke: var(--gold); }
+  .tab-item.active span { color: var(--gold-light); font-weight: 500; }
+
+  .tab-dot {
+    position: absolute;
+    top: -2px; right: -2px;
+    width: 7px; height: 7px;
+    background: var(--red);
+    border-radius: 50%;
+    border: 1.5px solid var(--surface);
+  }
+
+  .tab-icon-wrap { position: relative; display: inline-flex; }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 18 18" fill="none">
+        <path d="M9 2L16 6V12L9 16L2 12V6L9 2Z" fill="#1a1200" stroke="#1a1200" stroke-width="0.5"/>
+        <path d="M9 5L13 7.5V12.5L9 15L5 12.5V7.5L9 5Z" fill="#c9a84c" opacity="0.7"/>
+        <circle cx="9" cy="9" r="2" fill="#1a1200"/>
+      </svg>
+    </div>
+    <span class="logo-text">Nexa<span>Bank</span></span>
+  </div>
+  <div class="topnav-right">
+    <div class="avatar">DD</div>
+  </div>
+</nav>
+
+<!-- SCROLL CONTENT -->
+<div class="content">
+
+  <!-- GREETING -->
+  <div class="greeting">
+    <h1>Good morning, Dinku</h1>
+    <p>Monday, 21 April 2026 · Overview</p>
+  </div>
+
+  <!-- ACCOUNT CARD -->
+  <div class="account-card">
+    <div class="card-top">
+      <div>
+        <div class="card-label">Primary Account</div>
+        <div class="card-number">4821 •••• •••• 9304</div>
+      </div>
+      <div class="bank-chip">
+        <svg viewBox="0 0 22 18" fill="none">
+          <rect x="1" y="1" width="20" height="16" rx="2" stroke="#1a1200" stroke-width="1.2" fill="rgba(26,18,0,0.4)"/>
+          <line x1="1" y1="6" x2="21" y2="6" stroke="#1a1200" stroke-width="0.8"/>
+          <line x1="1" y1="12" x2="21" y2="12" stroke="#1a1200" stroke-width="0.8"/>
+          <line x1="7" y1="1" x2="7" y2="17" stroke="#1a1200" stroke-width="0.8"/>
+          <line x1="15" y1="1" x2="15" y2="17" stroke="#1a1200" stroke-width="0.8"/>
+        </svg>
+      </div>
+    </div>
+    <div class="card-bottom">
+      <div>
+        <div class="balance-label">Available Balance</div>
+        <div class="balance-amount"><sup>₹</sup>84,320<span style="font-size:20px;font-weight:300;">.50</span></div>
+      </div>
+      <div class="card-holder">
+        <div class="card-holder-label">Account Holder</div>
+        <div class="card-holder-name">DINKU DAS</div>
+        <div class="card-holder-id">4821930417</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card income">
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      </div>
+      <div class="stat-value">₹32.4K</div>
+      <div class="stat-label">Deposits</div>
+      <div class="stat-change up">▲ 12.4%</div>
+    </div>
+    <div class="stat-card expense">
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      </div>
+      <div class="stat-value">₹15.7K</div>
+      <div class="stat-label">Withdrawals</div>
+      <div class="stat-change down">▼ 3.1%</div>
+    </div>
+    <div class="stat-card transfer">
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+      </div>
+      <div class="stat-value">₹9.2K</div>
+      <div class="stat-label">Transfers</div>
+      <div class="stat-change up">▲ 5.8%</div>
+    </div>
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="section-title">Quick Actions</div>
+  <div class="actions-grid">
+    <div class="action-btn">
+      <div class="action-btn-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      </div>
+      <span>Deposit</span>
+    </div>
+    <div class="action-btn">
+      <div class="action-btn-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      </div>
+      <span>Withdraw</span>
+    </div>
+    <div class="action-btn">
+      <div class="action-btn-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+      </div>
+      <span>Transfer</span>
+    </div>
+    <div class="action-btn">
+      <div class="action-btn-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      </div>
+      <span>History</span>
+    </div>
+  </div>
+
+  <!-- TRANSACTIONS -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">Recent Transactions</span>
+      <span class="see-all">View all →</span>
+    </div>
+
+    <div class="txn-item">
+      <div class="txn-icon dep">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      </div>
+      <div class="txn-details">
+        <div class="txn-name">Cash Deposit</div>
+        <div class="txn-meta">4821930417 · DEPOSIT</div>
+      </div>
+      <div class="txn-amount">
+        <div class="amount pos">+₹12,000</div>
+        <div class="date">Today, 09:42</div>
+      </div>
+    </div>
+
+    <div class="txn-item">
+      <div class="txn-icon trf">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+      </div>
+      <div class="txn-details">
+        <div class="txn-name">Transfer to Raj Kumar</div>
+        <div class="txn-meta">3947201584 · TRANSFER</div>
+      </div>
+      <div class="txn-amount">
+        <div class="amount neg">−₹5,000</div>
+        <div class="date">Today, 08:15</div>
+      </div>
+    </div>
+
+    <div class="txn-item">
+      <div class="txn-icon wdw">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      </div>
+      <div class="txn-details">
+        <div class="txn-name">Cash Withdrawal</div>
+        <div class="txn-meta">4821930417 · WITHDRAW</div>
+      </div>
+      <div class="txn-amount">
+        <div class="amount neg">−₹3,500</div>
+        <div class="date">Apr 20, 14:30</div>
+      </div>
+    </div>
+
+    <div class="txn-item">
+      <div class="txn-icon dep">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      </div>
+      <div class="txn-details">
+        <div class="txn-name">Cash Deposit</div>
+        <div class="txn-meta">4821930417 · DEPOSIT</div>
+      </div>
+      <div class="txn-amount">
+        <div class="amount pos">+₹20,000</div>
+        <div class="date">Apr 19, 11:00</div>
+      </div>
+    </div>
+
+    <div class="txn-item">
+      <div class="txn-icon trf">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+      </div>
+      <div class="txn-details">
+        <div class="txn-name">Transfer from Priya S.</div>
+        <div class="txn-meta">7710284936 · TRANSFER</div>
+      </div>
+      <div class="txn-amount">
+        <div class="amount pos">+₹8,450</div>
+        <div class="date">Apr 18, 16:55</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACCOUNT INFO -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">Account Info</span>
+      <span class="badge-active">Active</span>
+    </div>
+    <div class="acc-info">
+      <div class="acc-row"><span class="k">Account No.</span><span class="v">4821930417</span></div>
+      <div class="acc-row"><span class="k">Account Type</span><span class="v">Savings</span></div>
+      <div class="acc-row"><span class="k">Database</span><span class="v">MySQL / JDBC</span></div>
+      <div class="acc-row"><span class="k">Build Tool</span><span class="v">Maven</span></div>
+      <div class="acc-row"><span class="k">Roll No.</span><span class="v">CSE XVII · 14</span></div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+      <span style="font-size:11px;color:var(--muted);">Monthly Activity</span>
+      <span style="font-size:11px;color:var(--muted2);">Apr 2026</span>
+    </div>
+    <div class="mini-chart">
+      <div class="bar" style="height:30%;background:var(--blue);opacity:0.5;"></div>
+      <div class="bar" style="height:50%;background:var(--blue);opacity:0.6;"></div>
+      <div class="bar" style="height:40%;background:var(--blue);opacity:0.55;"></div>
+      <div class="bar" style="height:70%;background:var(--blue);opacity:0.7;"></div>
+      <div class="bar" style="height:55%;background:var(--blue);opacity:0.6;"></div>
+      <div class="bar" style="height:90%;background:var(--gold);opacity:0.9;"></div>
+      <div class="bar" style="height:75%;background:var(--gold);opacity:0.75;"></div>
+    </div>
+    <div class="chart-labels">
+      <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM TAB BAR -->
+<nav class="tab-bar">
+  <div class="tab-item active">
+    <div class="tab-icon-wrap">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+    </div>
+    <span>Home</span>
+  </div>
+  <div class="tab-item">
+    <div class="tab-icon-wrap">
+      <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+    </div>
+    <span>Accounts</span>
+  </div>
+  <div class="tab-item">
+    <div class="tab-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+      <span class="tab-dot"></span>
+    </div>
+    <span>Transfer</span>
+  </div>
+  <div class="tab-item">
+    <div class="tab-icon-wrap">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+    </div>
+    <span>History</span>
+  </div>
+  <div class="tab-item">
+    <div class="tab-icon-wrap">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    </div>
+    <span>Profile</span>
+  </div>
+</nav>
+
+</body>
+</html>
